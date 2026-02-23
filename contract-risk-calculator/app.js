@@ -23,7 +23,6 @@
   var entry2Input = document.getElementById("entry2Price");
   var entry1RatioInput = document.getElementById("entry1Ratio");
   var entry2RatioDisplay = document.getElementById("entry2RatioDisplay");
-  var entry2RatioLabel = document.getElementById("entry2RatioText");
 
   var tpModeSelect = document.getElementById("tpMode");
   var singleTpBlock = document.getElementById("singleTpBlock");
@@ -41,10 +40,6 @@
       minimumFractionDigits: 0,
       maximumFractionDigits: digits
     });
-  }
-
-  function formatPercent(value, digits) {
-    return formatNumber(value * 100, digits) + "%";
   }
 
   function showError(message) {
@@ -76,7 +71,6 @@
       entry1RatioInput.value = "100";
       entry1RatioInput.disabled = true;
       entry2RatioDisplay.value = "0";
-      entry2RatioLabel.textContent = "0";
       return;
     }
 
@@ -94,7 +88,6 @@
 
     entry1RatioInput.value = String(value);
     entry2RatioDisplay.value = String(100 - value);
-    entry2RatioLabel.textContent = String(100 - value);
   }
 
   function syncTpMode() {
@@ -170,13 +163,15 @@
   }
 
   function renderSingleTp(singleTp) {
-    return "<h3>止盈结果（单一）</h3>" +
-      "<div class=\"result-grid\">" +
+    return "<section class=\"result-section\">" +
+      "<h3 class=\"result-section-title\">止盈结果（单一）</h3>" +
+      "<div class=\"result-grid result-grid--compact\">" +
       "<div><span>止盈价</span><strong>" + formatNumber(singleTp.tpPrice, 2) + "</strong></div>" +
       "<div><span>止盈场景手续费(开+平)</span><strong>" + formatNumber(singleTp.feeTotalTpUsdt, 4) + "</strong></div>" +
       "<div><span>预计止盈盈亏(USDT)</span><strong>" + formatNumber(singleTp.pnlTotal, 4) + "</strong></div>" +
       "<div><span>RR(按目标风险)</span><strong>" + formatNumber(singleTp.rrTarget, 4) + "R</strong></div>" +
-      "</div>";
+      "</div>" +
+      "</section>";
   }
 
   function renderMultiTp(multiTp) {
@@ -186,7 +181,6 @@
           "<td>TP" + level.index + "</td>" +
           "<td>" + formatNumber(level.tpPrice, 2) + "</td>" +
           "<td>" + formatNumber(level.closeRatio, 2) + "%</td>" +
-          "<td>" + formatNumber(level.closeNotionalUsdt, 4) + "</td>" +
           "<td>" + formatNumber(level.feeTpUsdt, 4) + "</td>" +
           "<td>" + formatNumber(level.pnl, 4) + "</td>" +
           "<td>" + formatNumber(level.rrTarget, 4) + "R</td>" +
@@ -194,41 +188,34 @@
       })
       .join("");
 
-    return "<h3>止盈结果（多级）</h3>" +
-      "<table class=\"tp-table\">" +
-      "<thead><tr><th>级别</th><th>价格</th><th>平仓比例</th><th>平仓金额(USDT)</th><th>手续费(USDT)</th><th>盈亏(USDT)</th><th>RR</th></tr></thead>" +
-      "<tbody>" + rows + "</tbody></table>" +
-      "<div class=\"result-grid\">" +
-      "<div><span>多级止盈总手续费(USDT)</span><strong>" + formatNumber(multiTp.totalFeeTpUsdt, 4) + "</strong></div>" +
+    return "<section class=\"result-section\">" +
+      "<h3 class=\"result-section-title\">止盈结果（多级）</h3>" +
+      "<div class=\"tp-table-wrap\"><table class=\"tp-table\">" +
+      "<thead><tr><th>级别</th><th>价格</th><th>平仓比例</th><th>手续费(USDT)</th><th>盈亏(USDT)</th><th>RR</th></tr></thead>" +
+      "<tbody>" + rows + "</tbody></table></div>" +
+      "<div class=\"result-grid result-grid--compact tp-summary-grid--compact\">" +
       "<div><span>总止盈盈亏(USDT)</span><strong>" + formatNumber(multiTp.totalPnl, 4) + "</strong></div>" +
       "<div><span>总RR(按目标风险)</span><strong>" + formatNumber(multiTp.totalRrTarget, 4) + "R</strong></div>" +
-      "</div>";
+      "</div>" +
+      "</section>";
   }
 
   function renderResult(position, tpResult, tpMode) {
-    var warningHtml = position.warnings
-      .map(function (item) {
-        return "<li>" + item + "</li>";
-      })
-      .join("");
+    var leg1MarginUsdt = position.leg1NotionalUsdt / position.leverage;
+    var leg2MarginUsdt = position.leg2NotionalUsdt / position.leverage;
 
     var html = "" +
-      "<h3>仓位结果</h3>" +
-      "<div class=\"result-grid\">" +
+      "<section class=\"result-section\">" +
+      "<h3 class=\"result-section-title\">仓位结果</h3>" +
+      "<div class=\"result-grid result-grid--compact\">" +
       "<div><span>方向</span><strong>" + position.direction + "</strong></div>" +
-      "<div><span>杠杆</span><strong>" + position.leverage + "x</strong></div>" +
-      "<div><span>总下单金额(USDT)</span><strong>" + formatNumber(position.orderNotionalUsdt, 4) + "</strong></div>" +
-      "<div><span>腿1下单金额(USDT)</span><strong>" + formatNumber(position.leg1NotionalUsdt, 4) + "</strong></div>" +
-      "<div><span>腿2下单金额(USDT)</span><strong>" + formatNumber(position.leg2NotionalUsdt, 4) + "</strong></div>" +
-      "<div><span>加权均价(E_avg)</span><strong>" + formatNumber(position.avgEntryExecuted, 4) + "</strong></div>" +
-      "<div><span>初始保证金(USDT)</span><strong>" + formatNumber(position.initialMargin, 4) + "</strong></div>" +
+      "<div><span>腿1保证金(USDT)</span><strong>" + formatNumber(leg1MarginUsdt, 4) + "</strong></div>" +
+      "<div><span>腿2保证金(USDT)</span><strong>" + formatNumber(leg2MarginUsdt, 4) + "</strong></div>" +
       "<div><span>止损场景手续费(开+平)</span><strong>" + formatNumber(position.feeTotalStopUsdt, 4) + "</strong></div>" +
       "<div><span>实际止损金额(USDT)</span><strong>" + formatNumber(position.actualLoss, 4) + "</strong></div>" +
-      "<div><span>剩余风险额度(USDT)</span><strong>" + formatNumber(position.unusedRisk, 4) + "</strong></div>" +
-      "<div><span>风险利用率</span><strong>" + formatPercent(position.riskUtilizationPct / 100, 2) + "</strong></div>" +
       "<div><span>止损价</span><strong>" + formatNumber(position.stopPrice, 4) + "</strong></div>" +
       "</div>" +
-      "<ul class=\"warning-list\">" + warningHtml + "</ul>";
+      "</section>";
 
     if (tpMode === "single") {
       html += renderSingleTp(tpResult);
@@ -268,11 +255,8 @@
       summary: {
         symbol: position.symbol,
         direction: position.direction,
-        orderNotionalUsdt: position.orderNotionalUsdt,
-        risk: position.actualLoss,
-        tpMode: tpMode,
-        tpPnl: tpMode === "single" ? tpResult.pnlTotal : tpResult.totalPnl,
-        rr: tpMode === "single" ? tpResult.rrTarget : tpResult.totalRrTarget
+        leg1MarginUsdt: position.leg1NotionalUsdt / position.leverage,
+        leg2MarginUsdt: position.leg2NotionalUsdt / position.leverage
       }
     });
     saveHistory(history);
@@ -288,17 +272,17 @@
     var html = history
       .map(function (item, index) {
         var time = new Date(item.timestamp).toLocaleString();
-        var orderNotional = Number.isFinite(item.summary.orderNotionalUsdt)
-          ? item.summary.orderNotionalUsdt
-          : item.summary.qtyTotal;
+        var summary = item.summary || {};
+        var symbol = summary.symbol || "-";
+        var direction = summary.direction || "-";
+        var leg1Margin = Number(summary.leg1MarginUsdt);
+        var leg2Margin = Number(summary.leg2MarginUsdt);
 
         return "<li>" +
           "<div class=\"history-main\">" +
-          "<strong>" + item.summary.symbol + " / " + item.summary.direction + "</strong>" +
-          "<span>下单金额: " + formatNumber(orderNotional, 4) + " USDT</span>" +
-          "<span>止损: " + formatNumber(item.summary.risk, 4) + " USDT</span>" +
-          "<span>止盈: " + formatNumber(item.summary.tpPnl, 4) + " USDT</span>" +
-          "<span>RR: " + formatNumber(item.summary.rr, 3) + "R</span>" +
+          "<strong>" + symbol + " / " + direction + "</strong>" +
+          "<span>腿1保证金: " + formatNumber(leg1Margin, 4) + " USDT</span>" +
+          "<span>腿2保证金: " + formatNumber(leg2Margin, 4) + " USDT</span>" +
           "<span class=\"history-time\">" + time + "</span>" +
           "</div>" +
           "<button type=\"button\" class=\"history-load\" data-index=\"" + index + "\">回填</button>" +
