@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bitget 合约下单金额计算器</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="container">
+    <header class="page-header">
+      <h1>Bitget 合约下单金额计算器</h1>
+      <p>固定 150x｜按固定亏损反推仓位｜支持最多 2 个入场价 + 单止损</p>
+    </header>
+
+    <form id="calculator-form" class="calculator-form">
+      <section class="card form-card form-card--base">
+        <h2>基础参数</h2>
+        <div class="param-groups">
+          <article class="param-group group-trading">
+            <div class="group-head">
+              <h3 class="group-title">交易设置</h3>
+              <p class="group-desc">先选择交易对，杠杆固定 150x，并设置手续费。</p>
+            </div>
+            <div class="form-grid form-grid--3">
+              <label>
+                <span>交易对</span>
+                <select id="symbol" name="symbol">
+                  <option value="BTCUSDT">BTCUSDT</option>
+                  <option value="ETHUSDT">ETHUSDT</option>
+                </select>
+              </label>
+
+              <label>
+                <span>杠杆（固定）</span>
+                <input id="leverage" type="text" value="150x" readonly>
+              </label>
+
+              <label>
+                <span>手续费率 %</span>
+                <input id="feeRatePct" type="number" min="0" step="0.0001" value="0.04">
+              </label>
+            </div>
+          </article>
+
+          <article class="param-group group-entry-risk">
+            <div class="group-head">
+              <h3 class="group-title">建仓与风险</h3>
+              <p class="group-desc">支持最多 2 个入场价，统一止损与固定亏损控制。</p>
+            </div>
+            <div class="form-grid form-grid--2">
+              <label>
+                <span>Entry1 价格 *</span>
+                <input id="entry1Price" type="number" min="0" step="any" required placeholder="如 100000">
+              </label>
+
+              <label>
+                <span>Entry2 价格（可空）</span>
+                <input id="entry2Price" type="number" min="0" step="any" placeholder="如 99500">
+              </label>
+
+              <label>
+                <span>Entry1 占比 %</span>
+                <input id="entry1Ratio" type="number" min="0" max="100" step="0.01" value="100">
+              </label>
+
+              <label>
+                <span>Entry2 占比 %（自动）</span>
+                <input type="text" id="entry2RatioDisplay" value="0" readonly>
+                <small><span id="entry2RatioText">0</span>%</small>
+              </label>
+
+              <label>
+                <span>止损价 *</span>
+                <input id="stopPrice" type="number" min="0" step="any" required placeholder="如 98000">
+              </label>
+
+              <label>
+                <span>固定亏损金额 (USDT) *</span>
+                <input id="riskAmountUsdt" type="number" min="0" step="any" required value="300">
+              </label>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <section class="card form-card form-card--tp">
+        <h2>止盈设置</h2>
+        <div class="form-grid form-grid--2">
+          <label>
+            <span>止盈模式</span>
+            <select id="tpMode" name="tpMode">
+              <option value="single">单一止盈</option>
+              <option value="multi">多级止盈（最多3级）</option>
+            </select>
+          </label>
+        </div>
+
+        <div id="singleTpBlock" class="tp-block">
+          <label>
+            <span>止盈价 *</span>
+            <input id="singleTpPrice" type="number" min="0" step="any" placeholder="如 105000">
+          </label>
+        </div>
+
+        <div id="multiTpBlock" class="tp-block" style="display: none;">
+          <table class="tp-input-table">
+            <thead>
+              <tr>
+                <th>级别</th>
+                <th>TP价格</th>
+                <th>平仓比例(%)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>TP1</td>
+                <td><input id="tp1Price" type="number" min="0" step="any" placeholder="可空"></td>
+                <td><input id="tp1Ratio" type="number" min="0" step="0.01" placeholder="可空"></td>
+              </tr>
+              <tr>
+                <td>TP2</td>
+                <td><input id="tp2Price" type="number" min="0" step="any" placeholder="可空"></td>
+                <td><input id="tp2Ratio" type="number" min="0" step="0.01" placeholder="可空"></td>
+              </tr>
+              <tr>
+                <td>TP3</td>
+                <td><input id="tp3Price" type="number" min="0" step="any" placeholder="可空"></td>
+                <td><input id="tp3Ratio" type="number" min="0" step="0.01" placeholder="可空"></td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="hint">提示：多级止盈比例总和必须等于 100%。</p>
+        </div>
+
+        <div class="actions">
+          <button type="submit">开始计算</button>
+        </div>
+      </section>
+    </form>
+
+    <section id="errorBox" class="card error" style="display: none;"></section>
+
+    <section id="resultBox" class="card result" style="display: none;"></section>
+
+    <section class="card">
+      <div class="history-head">
+        <h2>最近计算记录</h2>
+        <button id="clearHistory" type="button" class="ghost-btn">清空</button>
+      </div>
+      <ul id="historyList" class="history-list"></ul>
+    </section>
+  </main>
+
+  <script src="core.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
