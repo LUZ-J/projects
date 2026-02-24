@@ -31,19 +31,23 @@
 
 > 也可以在目录下启动本地静态服务后访问页面。
 
-## 公开分享（Netlify Drop）
+## 公开分享（GitHub Pages，Git 自动部署）
 
-这是纯静态项目，最省事的公开方式是 Netlify Drop：
+项目已提供 GitHub Pages 工作流：`.github/workflows/deploy-pages.yml`。
 
-1. 打开 [Netlify Drop](https://app.netlify.com/drop)
-2. 上传本目录下的 `share/contract-risk-calculator-netlify-drop.zip`
-3. 等待完成后获取 `https://xxx.netlify.app` 链接并分享
+### 首次启用
 
-### 持续更新建议
+1. 把代码推到 `master` 分支（已配置该分支触发部署）
+2. 打开仓库的 `Settings -> Pages`
+3. 在 `Build and deployment` 里把 Source 设为 `GitHub Actions`
+4. 等待 Actions 跑完后获得公开链接（通常是 `https://<你的用户名>.github.io/<仓库名>/`）
 
-1. 先登录 Netlify 并 Claim 站点
-2. 修改站点名称为更易记的地址
-3. 后续更新可继续 Drop 覆盖，或接入 GitHub 自动部署
+### 后续更新
+
+1. 修改代码
+2. `git add . && git commit -m "update"`
+3. `git push origin master`
+4. GitHub Actions 会自动重新部署
 
 ### 分享时建议附带说明
 
