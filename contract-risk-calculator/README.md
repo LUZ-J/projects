@@ -31,6 +31,26 @@
 
 > 也可以在目录下启动本地静态服务后访问页面。
 
+## 公开分享（Netlify Drop）
+
+这是纯静态项目，最省事的公开方式是 Netlify Drop：
+
+1. 打开 [Netlify Drop](https://app.netlify.com/drop)
+2. 上传本目录下的 `share/contract-risk-calculator-netlify-drop.zip`
+3. 等待完成后获取 `https://xxx.netlify.app` 链接并分享
+
+### 持续更新建议
+
+1. 先登录 Netlify 并 Claim 站点
+2. 修改站点名称为更易记的地址
+3. 后续更新可继续 Drop 覆盖，或接入 GitHub 自动部署
+
+### 分享时建议附带说明
+
+- 本工具为理论计算器，不连接交易所 API
+- 计算基于固定 150x 与当前页面参数口径
+- 历史记录保存在用户浏览器本地，不会同步到服务器
+
 ## 输入说明
 
 - `Entry1 价格`：必填
